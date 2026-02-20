@@ -1,7 +1,18 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
-#[link(name="testlib")]
+// Windows 特定的链接器指令
+#[cfg(target_os = "windows")]
+#[link(name = "testlib", kind = "static")]
+extern "C" {
+  fn add_numbers(a: i32, b: i32) -> i32;
+  fn process_string(input: *const c_char) -> *mut c_char;
+  fn free_string(ptr: *mut c_char);
+}
+
+// 非 Windows 平台的链接器指令
+#[cfg(not(target_os = "windows"))]
+#[link(name = "testlib")]
 extern "C" {
   fn add_numbers(a: i32, b: i32) -> i32;
   fn process_string(input: *const c_char) -> *mut c_char;
